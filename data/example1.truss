@@ -1,0 +1,80 @@
+// Example Truss
+
+/*
+
+== Language features ==
+
+Whitespace-insensitive.
+
+Anything to the left of an "=" is a variable.
+
+Declarations appear with names like "nodes", "elastic" and so on. They take
+maps of arguments. Maps are surrounded by braces ('{' and '}') and have
+key-value pairs, where the keys can be numeric (eg. node numbers) or text
+(eg. "E", "material"). Lists are delimited by '[' and ']', and have the
+characteristic that we don't know how many elements they might contain. Tuples
+are delimited by '(' and ')' and have the characteristic that in a given
+context, we always know how many elements they should contain.
+
+*/
+
+trussnodes = nodes
+  { 0 -> (0, 3, 0)
+  , 1 -> (0, 0, 0)
+  , 2 -> (3, 3, 0)
+  , 3 -> (3, 0, 0)
+  , 4 -> (6, 3, 0)
+  , 5 -> (6, 1, 0)
+  , 6 -> (9, 3, 0)
+  }
+
+steel = elastic
+  { E  -> 200E9   // Pa
+  , nu -> 0.3     // unitless
+  }
+
+trusssection = section1d
+  { area     -> 1.256E-3  // m^2
+  , material -> steel
+  }
+
+trusselements = truss2d
+  { nodes    -> trussnodes
+  , section  -> trusssection
+  , elements ->
+    [ (0, 1)
+    , (1, 3)
+    , (0, 3)
+    , (0, 2)
+    , (2, 3)
+    , (3, 5)
+    , (2, 5)
+    , (2, 4)
+    , (4, 5)
+    , (4, 6)
+    , (5, 6)
+    ]
+  }
+
+trussbcs = boundary
+  { nodes   -> trussnodes
+  , default -> (unknown, unknown, fix)  // implicitly fix z=0 for all
+  , fixed   ->
+    { 0 -> (fix, fix,  fix)  // completely fix the first node
+    , 1 -> (fix, free, fix)  // fix only the x,z coordinates of the second node
+    }
+  }
+
+trussforces = forces
+  { nodes  -> trussnodes
+  , forces ->
+    { 6 -> (free, -14000, free)   // apply 14kN to downward y-axis of node 6
+    }
+  }
+
+procedure
+  { type     -> static
+  , elements -> trusselements
+  , boundary -> trussbcs
+  , forces   -> trussforces
+  }
