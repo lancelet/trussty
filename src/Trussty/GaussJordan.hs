@@ -19,10 +19,13 @@ import           Data.Word              (Word16)
 -------------------------------------------------------------------------------
 -- * Basic types
 
+-- | Index type alias.
 type Index = Word16
 
+-- | Row index.
 newtype RowI = RowI { unRowI :: Index } deriving (Show, Eq, Ord)
 
+-- | Column index.
 newtype ColI = ColI { unColI :: Index } deriving (Show, Eq, Ord)
 
 -- | Dense matrix with mutable elements in the ST monad.
