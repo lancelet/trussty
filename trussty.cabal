@@ -19,6 +19,7 @@ library
                      , containers
                      , hashtables
                      , megaparsec
+                     , more-extensible-effects
                      , text
                      , vector
                      , vector-th-unbox
